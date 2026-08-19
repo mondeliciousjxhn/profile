@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raymond John Managuit — IT Technical Support &amp; Web Development</title>
+<meta name="description" content="Portfolio of Raymond John Managuit, an IT technical support professional with 3+ years across hardware/software troubleshooting, network support, web development, and data validation.">
+<meta name="theme-color" content="#0D1117">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Raymond John Managuit — IT Technical Support & Web Development">
+<meta property="og:description" content="IT technical support professional with 3+ years of experience in troubleshooting, network support, web development, and data validation.">
+<meta property="og:image" content="assets/profile-photo-white.jpg">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body data-theme="dark">
+<div class="page-atmosphere" aria-hidden="true"><span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span><div class="particles" id="particles"></div></div>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand"><span class="brand-dot"></span>RM<span style="color:var(--text-faint)">.dev</span></div>
+    <nav class="nav-links" id="navLinks" aria-label="Primary"></nav>
+    <div class="nav-right">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle dark and light mode">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <button class="btn btn-primary btn-sm" id="navContactBtn">Contact</button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-panel" id="mobilePanel"></div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div>
+        <div class="hero-kicker"><span class="dot"></span><span class="mono">STATUS: OPEN TO NEW OPPORTUNITIES</span></div>
+        <h1>Hi, I'm <span>Raymond</span> — IT support &amp; web development, kept reliable.</h1>
+        <p class="hero-role" id="heroIntro"></p>
+        <div class="hero-cta">
+          <button class="btn btn-primary" data-goto="projects">View My Work</button>
+          <a class="btn btn-outline" id="heroDownloadCv" href="#" download>Download CV</a>
+          <button class="btn btn-outline" data-goto="contact">Contact Me</button>
+        </div>
+        <div class="hero-tags" id="heroTags"></div>
+      </div>
+
+      <div class="portrait-stage reveal" id="portraitStage">
+        <div class="portrait-glow"></div>
+        <div class="portrait-backdrop backdrop-one"></div>
+        <div class="portrait-backdrop backdrop-two"></div>
+        <div class="portrait-shell">
+          <img id="heroPortrait" src="assets/profile-photo-white.jpg" alt="Portrait of Raymond John Managuit" width="720" height="900">
+          <div class="portrait-shine"></div>
+        </div>
+        <div class="portrait-shadow"></div>
+        <div class="skill-orbit" id="skillOrbit" aria-label="Selected skills"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">About</div>
+        <h2 class="section-title">A support engineer who also ships web features.</h2>
+      </div>
+      <div class="about-layout">
+        <div class="reveal">
+          <div class="about-text" id="aboutText"></div>
+          <div class="about-focus">
+            <div class="about-focus-title">Core focus areas</div>
+            <ul class="about-focus-list" id="focusList"></ul>
+          </div>
+        </div>
+        <div class="about-cards reveal" id="aboutCards"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SKILLS ============ -->
+  <section class="section" id="skills">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Skills &amp; Technologies</div>
+        <h2 class="section-title">Modules I work with day to day.</h2>
+        <p class="section-desc">Grouped by discipline. Filter to a category, or browse everything.</p>
+      </div>
+      <div class="skill-filters reveal" id="skillFilters"></div>
+      <div class="skill-groups reveal" id="skillGroups"></div>
+      <div class="languages-row reveal" id="languagesRow"></div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section class="section" id="experience">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Professional Experience</div>
+        <h2 class="section-title">A running log of where I've worked.</h2>
+        <p class="section-desc">Ordered by date — tap any entry to expand the details.</p>
+      </div>
+      <div class="timeline reveal" id="timeline"></div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS ============ -->
+  <section class="section" id="projects">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Featured Projects</div>
+        <h2 class="section-title">What I've built and maintained.</h2>
+        <p class="section-desc">Drawn directly from my professional experience.</p>
+      </div>
+      <div class="project-grid reveal" id="projectGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ EDUCATION + CERTS ============ -->
+  <section class="section" id="education">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Education &amp; Certifications</div>
+        <h2 class="section-title">Formal training and continued learning.</h2>
+      </div>
+      <div class="edu-cert-grid">
+        <div class="reveal">
+          <div id="eduList"></div>
+        </div>
+        <div class="reveal">
+          <div class="cert-list" id="certList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESUME ============ -->
+  <section class="section" id="resume">
+    <div class="container">
+      <div class="resume-band reveal">
+        <div>
+          <h3>Want the full picture?</h3>
+          <p>Download or view my complete CV as a PDF.</p>
+        </div>
+        <div class="resume-actions">
+          <a class="btn btn-primary" id="resumeDownload" href="#" download>Download CV</a>
+          <a class="btn btn-outline" id="resumeView" href="#" target="_blank" rel="noopener">View CV</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" id="contact" style="border-bottom:none;">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Contact</div>
+        <h2 class="section-title">Let's talk about an opportunity.</h2>
+        <p class="section-desc">Reach out directly, or send a message below.</p>
+      </div>
+      <div class="contact-layout">
+        <div class="reveal">
+          <div class="contact-list" id="contactList"></div>
+        </div>
+        <form class="reveal" id="contactForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" autocomplete="name" required>
+              <div class="err" id="err-name"></div>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" autocomplete="email" required>
+              <div class="err" id="err-email"></div>
+            </div>
+            <div class="field full">
+              <label for="cf-subject">Subject</label>
+              <input id="cf-subject" name="subject" type="text" required>
+              <div class="err" id="err-subject"></div>
+            </div>
+            <div class="field full">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" rows="5" required></textarea>
+              <div class="err" id="err-message"></div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Send Message</button>
+          <div class="form-status" id="formStatus"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="container">
+  <span class="mono">&copy; <span id="year"></span> Raymond John Managuit</span>
+  <span class="mono">Built with intent, not a template.</span>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- Project detail modal -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal" role="dialog" aria-modal="true" id="modalContent"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
