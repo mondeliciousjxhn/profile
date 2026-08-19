@@ -19,7 +19,7 @@ window.PORTFOLIO_DATA = {
     phone: "0994 886 0249",
     photo: "assets/profile-photo-white.jpg",
     experienceYears: "3+",
-    status: "Open to new opportunities",
+    status: "Employed but open to opportunities",
     summary:
       "I'm an IT professional with three-plus years across technical support, IT operations, and data validation. My day-to-day covers hardware and software troubleshooting, Windows administration, network support, IT asset management, and technical documentation — with a growing focus on web development and data quality assurance. I care about reliable systems, clean processes, and support that actually resolves the issue.",
     heroIntro:
