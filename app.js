@@ -77,12 +77,70 @@ function renderHero() {
   $("#heroDownloadCv").download = D.resume.filename;
   $("#heroPortrait").src = D.profile.photo;
 
-  const preferred = ["Next.js", "HTML", "CSS", "JavaScript", "IT Technical Support"];
-  const available = D.skillGroups.flatMap(g => g.items);
-  $("#skillOrbit").innerHTML = preferred.filter(x => available.includes(x)).slice(0,4)
-    .map((s,i) => `<span class="skill-float skill-float-${i}">${s}</span>`).join("");
-}
+  const skillIcons = {
+  "Next.js": `
+    <svg viewBox="0 0 24 24" aria-label="Next.js">
+      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+      <path d="M7.5 16V8l9 8V8" 
+        fill="none" 
+        stroke="white" 
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+    </svg>
+  `,
 
+  "HTML": `
+    <svg viewBox="0 0 24 24" aria-label="HTML">
+      <path d="M4 3l1.5 17L12 22l6.5-2L20 3H4z" fill="#E44D26"/>
+      <path d="M12 20V5h6.5l-1.2 13.5L12 20z" fill="#F16529"/>
+      <path d="M12 9H8.5l.2 2H12v2H8.2l.3 3L12 17v3l-5.4-1.5L6 14h2.2l.1.9 3.7 1.1v-3H6.9L6.4 7H12z" fill="white"/>
+    </svg>
+  `,
+
+  "CSS": `
+    <svg viewBox="0 0 24 24" aria-label="CSS">
+      <path d="M4 3l1.5 17L12 22l6.5-2L20 3H4z" fill="#264DE4"/>
+      <path d="M12 20V5h6.5l-1.2 13.5L12 20z" fill="#2965F1"/>
+      <path d="M12 9H8.5l.2 2H12v2H8.2l.3 3L12 17v3l-5.4-1.5L6 14h2.2l.1.9 3.7 1.1v-3H6.9L6.4 7H12z" fill="white"/>
+    </svg>
+  `,
+
+  "JavaScript": `
+    <svg viewBox="0 0 24 24" aria-label="JavaScript">
+      <rect x="3" y="3" width="18" height="18" fill="#F7DF1E"/>
+      <path d="M12 17.5c.7 1.2 1.8 1.8 3.2 1.8 1.4 0 2.4-.7 2.4-1.9 0-1.3-1-1.8-2.7-2.5l-.6-.3c-1.7-.7-2.8-1.5-2.8-3.3 0-1.6 1.2-2.9 3.2-2.9 1.4 0 2.4.5 3.1 1.8l-1.7 1.1c-.4-.7-.8-1-1.5-1-.7 0-1.1.4-1.1 1 0 .7.4 1 1.5 1.5l.6.3c2 .9 3.1 1.7 3.1 3.6 0 2.1-1.6 3.2-3.8 3.2-2.1 0-3.5-1-4.2-2.3zM6.2 17.7c.3.6.6 1.1 1.3 1.1.7 0 1.1-.3 1.1-1.4v-7.5h2.3v7.5c0 2.4-1.4 3.5-3.5 3.5-1.9 0-3-1-3.6-2.2z" fill="#000"/>
+    </svg>
+  `,
+
+  "IT Technical Support": `
+    <svg viewBox="0 0 24 24" aria-label="IT Technical Support">
+      <path d="M4 5h16v11H4z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="12" cy="10.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M8.5 10.5a3.5 3.5 0 0 1 7 0" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+  `
+};
+
+const preferred = ["Next.js", "HTML", "CSS", "JavaScript", "IT Technical Support"];
+const available = D.skillGroups.flatMap(g => g.items);
+
+$("#skillOrbit").innerHTML = preferred
+  .filter(skill => available.includes(skill))
+  .slice(0, 4)
+  .map((skill, i) => `
+    <span
+      class="skill-float skill-float-${i}"
+      data-tooltip="${skill}"
+      aria-label="${skill}"
+    >
+      ${skillIcons[skill]}
+      <span class="skill-tooltip" role="tooltip">${skill}</span>
+    </span>
+  `)
+  .join("");
+}
 /* =========================================================
    RENDER: ABOUT
    ========================================================= */
