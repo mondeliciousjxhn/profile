@@ -1523,6 +1523,7 @@ footer .mono {
   z-index: 0;
 }
 .skill-float {
+  cursor: pointer;
   position: absolute;
   z-index: 5;
 
@@ -1589,14 +1590,12 @@ footer .mono {
 /* Custom tooltip */
 .skill-tooltip {
   position: absolute;
-
   left: 50%;
   bottom: calc(100% + 12px);
 
   transform: translateX(-50%) translateY(6px);
 
   padding: 6px 10px;
-
   white-space: nowrap;
 
   font-size: 11px;
@@ -1612,7 +1611,6 @@ footer .mono {
 
   opacity: 0;
   visibility: hidden;
-
   pointer-events: none;
 
   transition:
@@ -1620,7 +1618,23 @@ footer .mono {
     transform 0.2s ease,
     visibility 0.2s ease;
 
-  z-index: 20;
+  z-index: 100;
+}
+
+/* Desktop hover */
+@media (hover: hover) {
+  .skill-float:hover .skill-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Mobile: show when tapped */
+.skill-float.tooltip-open .skill-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Tooltip arrow */
@@ -1665,18 +1679,53 @@ footer .mono {
 }
 @media (max-width: 760px) {
   .portrait-stage {
-    min-height: 430px;
+    min-height: 480px;
   }
+
   .portrait-shell {
-    width: min(82%, 330px);
+    width: min(78%, 300px);
   }
-  .skill-float-1,
+
+  /* Keep all skill icons visible */
+  .skill-float {
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+  }
+
+  /* Reposition icons for mobile */
+  .skill-float-0 {
+    top: 4%;
+    left: 2%;
+  }
+
+  .skill-float-1 {
+    top: 18%;
+    right: 0;
+  }
+
   .skill-float-2 {
-    display: none;
+    bottom: 18%;
+    left: 0;
   }
+
+  .skill-float-3 {
+    bottom: 5%;
+    right: 4%;
+  }
+
   .orb {
     filter: blur(42px);
   }
+}
+
+.portrait-stage,
+.skill-orbit {
+  overflow: visible;
+}
+
+.skill-tooltip {
+  z-index: 100;
 }
 @media (prefers-reduced-motion: reduce) {
   .orb,

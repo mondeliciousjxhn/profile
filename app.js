@@ -130,17 +130,48 @@ $("#skillOrbit").innerHTML = preferred
   .filter(skill => available.includes(skill))
   .slice(0, 4)
   .map((skill, i) => `
-    <span
+    <button
       class="skill-float skill-float-${i}"
-      data-tooltip="${skill}"
+      type="button"
       aria-label="${skill}"
+      aria-expanded="false"
     >
       ${skillIcons[skill]}
       <span class="skill-tooltip" role="tooltip">${skill}</span>
-    </span>
+    </button>
   `)
   .join("");
 }
+
+const skillButtons = $$(".skill-float");
+
+skillButtons.forEach(button => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const isOpen = button.classList.contains("tooltip-open");
+
+    // Close all other tooltips
+    skillButtons.forEach(item => {
+      item.classList.remove("tooltip-open");
+      item.setAttribute("aria-expanded", "false");
+    });
+
+    // Toggle the tapped tooltip
+    if (!isOpen) {
+      button.classList.add("tooltip-open");
+      button.setAttribute("aria-expanded", "true");
+    }
+  });
+});
+
+// Close tooltip when tapping anywhere else
+document.addEventListener("click", () => {
+  skillButtons.forEach(button => {
+    button.classList.remove("tooltip-open");
+    button.setAttribute("aria-expanded", "false");
+  });
+});
 /* =========================================================
    RENDER: ABOUT
    ========================================================= */
