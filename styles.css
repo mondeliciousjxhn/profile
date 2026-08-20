@@ -1378,24 +1378,25 @@ footer .mono {
   transform: scaleX(0);
   z-index: 1000;
 }
-.cursor-ring {
-  position: fixed;
-  left: -16px;
-  top: -16px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--accent);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 2000;
-  mix-blend-mode: screen;
-  opacity: 0;
-  transition:
-    width 0.2s,
-    height 0.2s,
-    opacity 0.2s,
-    border-color 0.2s;
+.cursor-dot, .cursor-ring{
+  position:fixed; top:0; left:0;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:400;
+  opacity:0;
+  transition:opacity .2s ease;
+  transform:translate(-50%,-50%);
 }
+.cursor-dot{
+  width:6px; height:6px;
+  background:var(--accent);
+}
+body.cursor-active .cursor-dot,
+body.cursor-active .cursor-ring{ opacity:1; }
+body.cursor-active{ cursor:none; }
+body.cursor-active a, body.cursor-active button, body.cursor-active .project-card, body.cursor-active .f-badge{ cursor:none; }
+.cursor-ring.ring-hover{ width:52px; height:52px; background:var(--accent-soft); }
+.cursor-ring.ring-view{ width:64px; height:64px; background:var(--accent-soft); }
 .has-fine-pointer .cursor-ring {
   opacity: 0.7;
 }
@@ -1416,6 +1417,22 @@ footer .mono {
   z-index: 1999;
   transform: translate(-50%, -50%);
   animation: clickRipple 0.7s ease-out forwards;
+}
+.ripple{
+  position:fixed;
+  width:10px; height:10px;
+  border-radius:50%;
+  border:1px solid var(--accent);
+  top:0; left:0;
+  transform:translate(-50%,-50%) scale(0);
+  pointer-events:none;
+  z-index:250;
+  opacity:.55;
+  animation:rippleOut .9s ease-out forwards;
+}
+.ripple.click{ border-color:var(--amber); border-width:1.5px; }
+@keyframes rippleOut{
+  to{ transform:translate(-50%,-50%) scale(9); opacity:0; }
 }
 @keyframes clickRipple {
   to {

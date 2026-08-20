@@ -2,6 +2,53 @@ const D = window.PORTFOLIO_DATA;
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const desktopFX = isFinePointer && !prefersReducedMotion;
+
+function initCursor() {
+  if (!desktopFX) return; // skip on touch devices / reduced-motion
+  const dot = $("#cursorDot");
+  const ring = $("#cursorRing");
+  document.body.classList.add("cursor-active");
+
+  let x = 0, y = 0, rx = 0, ry = 0;
+  window.addEventListener("mousemove", (e) => {
+    x = e.clientX; y = e.clientY;
+    dot.style.left = x + "px"; dot.style.top = y + "px";
+  });
+
+  function loop() {
+    // ring lags behind the dot for a soft "trailing" feel
+    rx += (x - rx) * 0.18;
+    ry += (y - ry) * 0.18;
+    ring.style.left = rx + "px"; ring.style.top = ry + "px";
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  const hoverables = "a, button, .f-badge, .skill-chip, .filter-chip";
+  document.addEventListener("mouseover", (e) => {
+    const card = e.target.closest(".project-card");
+    const generic = e.target.closest(hoverables);
+    if (card) {
+      ring.classList.add("ring-view");
+      ring.textContent = "VIEW";
+    } else if (generic) {
+      ring.classList.add("ring-hover");
+      ring.textContent = "";
+    }
+  });
+  document.addEventListener("mouseout", (e) => {
+    const card = e.target.closest(".project-card");
+    const generic = e.target.closest(hoverables);
+    if (card || generic) {
+      ring.classList.remove("ring-view", "ring-hover");
+      ring.textContent = "";
+    }
+  });
+}
+
+
 
 /* =========================================================
    ICONS (small inline set, no external icon font needed)
@@ -527,6 +574,29 @@ function initInteractions() {
   });
 }
 
+function initRipple() {
+  if (!desktopFX) return;
+  let lastX = -999, lastY = -999;
+
+  function spawn(x, y, isClick) {
+    const el = document.createElement("div");
+    el.className = "ripple" + (isClick ? " click" : "");
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    document.body.appendChild(el);
+    el.addEventListener("animationend", () => el.remove()); // self-cleans, no leak
+  }
+
+  document.addEventListener("mousemove", (e) => {
+    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+    if (dist > 90) { // only spawn every ~90px of movement, not every pixel
+      lastX = e.clientX; lastY = e.clientY;
+      spawn(e.clientX, e.clientY, false);
+    }
+  });
+  document.addEventListener("click", (e) => spawn(e.clientX, e.clientY, true));
+}
+
 /* =========================================================
    INIT
    ========================================================= */
@@ -545,6 +615,8 @@ function init() {
   initReveal();
   initMisc();
   initInteractions();
+  initCursor();
+  initRipple();
 }
 
 document.addEventListener("DOMContentLoaded", init);
