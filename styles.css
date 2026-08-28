@@ -75,6 +75,113 @@ html {
   }
 }
 
+/* =========================================================
+   BOOT LOADER
+   Hidden by default (safe if JS never runs); only shown once
+   JS adds `boot-armed` to <body> — see app.js. Skipped entirely
+   for prefers-reduced-motion via the `no-boot` class set by an
+   inline script in <head>, before first paint.
+   ========================================================= */
+.boot-loader {
+  display: none;
+}
+html.no-boot .boot-loader {
+  display: none !important;
+}
+body.boot-armed .boot-loader {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+}
+body.boot-armed.boot-done .boot-loader {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+body.boot-armed:not(.boot-done) {
+  overflow: hidden;
+}
+.boot-panel {
+  font-family: var(--font-mono);
+  text-align: left;
+  min-width: 240px;
+}
+.boot-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 21px;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+.boot-brand span {
+  color: var(--text-faint);
+}
+.boot-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.boot-lines li {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: bootLineIn 0.45s ease forwards;
+}
+.boot-lines li:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.boot-lines li:nth-child(2) {
+  animation-delay: 0.28s;
+}
+.boot-lines li:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.boot-lines li:nth-child(4) {
+  animation-delay: 0.72s;
+}
+.boot-lines b {
+  color: var(--amber);
+  font-weight: 600;
+}
+.boot-lines em {
+  color: var(--accent);
+  font-style: normal;
+}
+@keyframes bootLineIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.boot-bar {
+  width: 220px;
+  height: 2px;
+  background: var(--border-soft);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.boot-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--amber));
+  animation: bootBar 1s ease forwards 0.1s;
+}
+@keyframes bootBar {
+  to {
+    width: 100%;
+  }
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -151,6 +258,7 @@ button {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+  animation: pulse 2.4s ease-in-out infinite;
 }
 
 .section {
@@ -182,6 +290,56 @@ button {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+}
+
+/* stagger: applied to a handful of grid/list containers so their
+   children ("cards") appear one after another instead of all at
+   once. Safe-by-default: children are only pre-hidden once the
+   container is a `.stagger` — no separate JS arming needed since
+   this piggybacks on the existing `.reveal` IntersectionObserver. */
+.stagger > * {
+  opacity: 0;
+  transform: translateY(14px);
+}
+.stagger.is-visible > * {
+  animation: staggerIn 0.6s var(--ease) forwards;
+}
+.stagger.is-visible > *:nth-child(1) {
+  animation-delay: 0.03s;
+}
+.stagger.is-visible > *:nth-child(2) {
+  animation-delay: 0.09s;
+}
+.stagger.is-visible > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger.is-visible > *:nth-child(4) {
+  animation-delay: 0.21s;
+}
+.stagger.is-visible > *:nth-child(5) {
+  animation-delay: 0.27s;
+}
+.stagger.is-visible > *:nth-child(6) {
+  animation-delay: 0.33s;
+}
+.stagger.is-visible > *:nth-child(7) {
+  animation-delay: 0.39s;
+}
+.stagger.is-visible > *:nth-child(n + 8) {
+  animation-delay: 0.45s;
+}
+@keyframes staggerIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
 }
 
 /* =========================================================
@@ -241,27 +399,43 @@ button {
 }
 
 .nav-links {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 2px;
 }
 .nav-links button {
+  position: relative;
+  z-index: 1;
   background: none;
   border: none;
   color: var(--text-muted);
   font-size: 13.5px;
   padding: 8px 13px;
   border-radius: 20px;
-  transition:
-    color 0.25s,
-    background 0.25s;
+  transition: color 0.25s;
 }
 .nav-links button:hover {
   color: var(--text);
 }
 .nav-links button.active {
   color: var(--text);
+}
+.nav-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
   background: var(--surface-2);
+  border-radius: 20px;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.35s var(--ease),
+    width 0.35s var(--ease),
+    opacity 0.2s ease;
 }
 
 .nav-right {
@@ -286,10 +460,15 @@ button {
 }
 .icon-btn:hover {
   border-color: var(--accent);
+  transform: scale(1.08);
 }
 .icon-btn svg {
   width: 16px;
   height: 16px;
+  transition: transform 0.35s var(--ease);
+}
+.icon-btn:hover svg {
+  transform: rotate(20deg);
 }
 
 .btn {
@@ -308,6 +487,9 @@ button {
     background 0.2s,
     color 0.2s;
   white-space: nowrap;
+}
+.btn:hover {
+  transform: scale(1.035);
 }
 .btn:active {
   transform: scale(0.97);
@@ -346,11 +528,109 @@ button {
   overflow: hidden;
   border-bottom: 1px solid var(--border-soft);
 }
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--border-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(
+    ellipse 75% 55% at 50% 0%,
+    black 0%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(ellipse 75% 55% at 50% 0%, black 0%, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
 .hero-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 48px;
   align-items: center;
+}
+
+/* small idle-drifting accents — restrained, aria-hidden, decorative only */
+.hero-deco {
+  position: absolute;
+  pointer-events: none;
+  color: var(--accent);
+  opacity: 0.5;
+  z-index: 0;
+}
+.hero-deco-ring {
+  top: 8%;
+  left: 46%;
+  width: 34px;
+  height: 34px;
+  border: 1.5px dashed var(--border);
+  border-radius: 50%;
+  animation: decoSpin 22s linear infinite;
+}
+.hero-deco-plus {
+  bottom: 14%;
+  left: 40%;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--text-faint);
+  animation: decoDrift 7s ease-in-out infinite;
+}
+@keyframes decoSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes decoDrift {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+@media (max-width: 900px) {
+  .hero-deco {
+    display: none;
+  }
+}
+
+/* hero entrance choreography — default state is fully visible;
+   `js-hero-armed` (added only when JS runs and motion isn't reduced)
+   is what hides things pre-reveal, so a JS failure never leaves
+   content invisible. */
+body.js-hero-armed .hero-copy > * {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(4px);
+}
+body.hero-ready .hero-copy > * {
+  animation: heroReveal 0.8s var(--ease) forwards;
+}
+body.hero-ready .hero-copy > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+body.hero-ready .hero-copy > *:nth-child(2) {
+  animation-delay: 0.16s;
+}
+body.hero-ready .hero-copy > *:nth-child(3) {
+  animation-delay: 0.28s;
+}
+body.hero-ready .hero-copy > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+body.hero-ready .hero-copy > *:nth-child(5) {
+  animation-delay: 0.5s;
+}
+body.hero-ready .hero-copy > *:nth-child(6) {
+  animation-delay: 0.6s;
+}
+@keyframes heroReveal {
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
 }
 .hero-kicker {
   font-family: var(--font-mono);
@@ -407,104 +687,36 @@ button {
   color: var(--text-muted);
 }
 
-/* status panel — the signature element */
-.status-panel {
-  position: relative;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, var(--surface), var(--surface-2));
-  overflow: hidden;
-  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.55);
-}
-.status-panel-head {
+/* hero stat strip — quick, real numbers pulled straight from data.js */
+.hero-stats {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border-soft);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-faint);
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-soft);
 }
-.status-panel-head .lights {
+.hero-stat {
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
 }
-.status-panel-head .lights span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--border);
-}
-
-.status-stage {
-  height: 220px;
-  position: relative;
-}
-.status-stage canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-.status-stage-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-
-.status-photo-wrap {
-  position: absolute;
-  right: 22px;
-  bottom: 0;
-  width: 120px;
-  height: 150px;
-  border-radius: 10px 10px 4px 4px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 26px -10px rgba(0, 0, 0, 0.6);
-  background: var(--surface-2);
-}
-.status-photo-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.status-fields {
-  padding: 16px 18px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 18px;
-  font-family: var(--font-mono);
-}
-.status-field .k {
-  font-size: 10.5px;
-  color: var(--text-faint);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.status-field .v {
-  font-size: 13px;
-  margin-top: 3px;
+.hero-stat .num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 650;
   color: var(--text);
+  line-height: 1;
 }
-.status-field .v.ok {
-  color: var(--amber);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.hero-stat .num span {
+  color: var(--accent);
 }
-.status-field .v.ok::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--amber);
+.hero-stat .lbl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* =========================================================
@@ -541,6 +753,20 @@ button {
 .about-card:hover {
   border-color: var(--accent-dim);
   transform: translateY(-2px);
+}
+.about-card .ic {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.about-card .ic svg {
+  width: 16px;
+  height: 16px;
 }
 .about-card .k {
   font-family: var(--font-mono);
@@ -634,6 +860,18 @@ button {
   margin-bottom: 14px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.skill-group h3 .grp-ic {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.skill-group h3 .grp-ic svg {
+  width: 100%;
+  height: 100%;
 }
 .skill-chip-list {
   display: flex;
@@ -689,6 +927,20 @@ button {
   position: relative;
   border-left: 1px solid var(--border);
   margin-left: 6px;
+}
+.tl-fill {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 2px;
+  height: 0%;
+  background: linear-gradient(var(--accent), var(--amber));
+  transition: height 0.1s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-fill {
+    transition: none;
+  }
 }
 .tl-item {
   position: relative;
@@ -822,14 +1074,20 @@ button {
   padding: 26px;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  will-change: transform;
+  transform: perspective(900px) rotateX(var(--ptx, 0deg)) rotateY(var(--pty, 0deg))
+    translateY(0);
   transition:
     border-color 0.25s,
-    transform 0.25s;
-  cursor: pointer;
+    box-shadow 0.3s,
+    transform 0.25s var(--ease);
 }
 .project-card:hover {
   border-color: var(--accent-dim);
-  transform: translateY(-3px);
+  box-shadow: 0 26px 50px -28px rgba(0, 0, 0, 0.55);
+  transform: perspective(900px) rotateX(var(--ptx, 0deg)) rotateY(var(--pty, 0deg))
+    translateY(-8px);
 }
 .project-role {
   font-family: var(--font-mono);
@@ -861,6 +1119,12 @@ button {
   border-radius: 5px;
   background: var(--surface-2);
   color: var(--text-muted);
+  transition:
+    transform 0.25s var(--ease),
+    background 0.25s;
+}
+.project-card:hover .project-tech span {
+  transform: translateY(-1px);
 }
 .project-more {
   margin-top: 18px;
@@ -869,6 +1133,17 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  transition: gap 0.25s var(--ease);
+}
+.project-more .arrow {
+  display: inline-block;
+  transition: transform 0.25s var(--ease);
+}
+.project-card:hover .project-more {
+  gap: 10px;
+}
+.project-card:hover .project-more .arrow {
+  transform: translateX(3px);
 }
 
 /* modal */
@@ -1064,6 +1339,13 @@ button {
   background: var(--surface);
   border-radius: var(--radius-md);
   padding: 14px 16px;
+  transition:
+    border-color 0.25s,
+    transform 0.25s var(--ease);
+}
+.contact-row:hover {
+  border-color: var(--accent-dim);
+  transform: translateX(4px);
 }
 .contact-row .ic {
   width: 38px;
@@ -1079,6 +1361,10 @@ button {
 .contact-row .ic svg {
   width: 17px;
   height: 17px;
+  transition: transform 0.35s var(--ease);
+}
+.contact-row:hover .ic svg {
+  transform: rotate(10deg) scale(1.12);
 }
 .contact-row .t {
   font-size: 11px;
@@ -1195,10 +1481,15 @@ footer .mono {
 }
 .back-to-top:hover {
   border-color: var(--accent);
+  transform: translateY(-3px) scale(1.06);
 }
 .back-to-top svg {
   width: 16px;
   height: 16px;
+  transition: transform 0.3s var(--ease);
+}
+.back-to-top:hover svg {
+  transform: translateY(-2px);
 }
 
 /* =========================================================
@@ -1236,6 +1527,39 @@ footer .mono {
   border-bottom: 1px solid var(--border-soft);
   color: var(--text-muted);
   font-size: 15px;
+  transition: color 0.2s;
+}
+.mobile-panel.open button {
+  opacity: 0;
+  transform: translateX(-8px);
+  animation: mobileItemIn 0.35s var(--ease) forwards;
+}
+.mobile-panel.open button:nth-child(1) {
+  animation-delay: 0.04s;
+}
+.mobile-panel.open button:nth-child(2) {
+  animation-delay: 0.09s;
+}
+.mobile-panel.open button:nth-child(3) {
+  animation-delay: 0.14s;
+}
+.mobile-panel.open button:nth-child(4) {
+  animation-delay: 0.19s;
+}
+.mobile-panel.open button:nth-child(5) {
+  animation-delay: 0.24s;
+}
+.mobile-panel.open button:nth-child(6) {
+  animation-delay: 0.29s;
+}
+.mobile-panel.open button:nth-child(n + 7) {
+  animation-delay: 0.34s;
+}
+@keyframes mobileItemIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .mobile-panel button.active {
   color: var(--accent);
@@ -1247,9 +1571,6 @@ footer .mono {
 @media (max-width: 920px) {
   .hero-grid {
     grid-template-columns: 1fr;
-  }
-  .status-panel {
-    max-width: 420px;
   }
   .about-layout,
   .contact-layout,
@@ -1277,11 +1598,6 @@ footer .mono {
   .resume-band {
     flex-direction: column;
     align-items: flex-start;
-  }
-  .status-photo-wrap {
-    width: 96px;
-    height: 120px;
-    right: 16px;
   }
 }
 
@@ -1477,8 +1793,23 @@ body.cursor-active a, body.cursor-active button, body.cursor-active .project-car
   transition: transform 0.6s var(--ease);
   filter: saturate(1.04) contrast(1.02);
 }
-.portrait-stage:hover .portrait-shell img {
+.portrait-stage:hover .portrait-shell img#heroPortrait {
   transform: scale(1.07);
+}
+.portrait-lqip {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  filter: blur(18px) saturate(1.05);
+  transform: scale(1.12);
+  transition: opacity 0.5s ease;
+}
+#heroPortrait {
+  position: relative;
+  z-index: 2;
+}
+.portrait-lqip.is-hidden {
+  opacity: 0;
 }
 .portrait-shine {
   position: absolute;
@@ -1686,13 +2017,6 @@ body.cursor-active a, body.cursor-active button, body.cursor-active .project-car
   50% {
     transform: translateY(-9px);
   }
-}
-.project-card {
-  will-change: transform;
-}
-.project-card:hover {
-  transform: translateY(-8px) rotateX(1deg);
-  box-shadow: 0 26px 50px -28px rgba(0, 0, 0, 0.7);
 }
 @media (max-width: 760px) {
   .portrait-stage {
