@@ -5,6 +5,20 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const isFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 const desktopFX = isFinePointer && !prefersReducedMotion;
 
+/* Boot sequence + hero reveal choreography.
+   Body only gets "boot-armed"/"js-hero-armed" when motion isn't
+   reduced, and the loader/hero pre-hide styles in styles.css key
+   off those classes — so if this never runs (or throws), the page
+   just renders normally with nothing hidden. */
+(function runBootSequence() {
+  if (prefersReducedMotion) return;
+  const BOOT_MS = 1050;
+  document.body.classList.add("boot-armed", "js-hero-armed");
+  setTimeout(() => {
+    document.body.classList.add("boot-done", "hero-ready");
+  }, BOOT_MS);
+})();
+
 function initCursor() {
   if (!desktopFX) return; // skip on touch devices / reduced-motion
   const dot = $("#cursorDot");
@@ -56,12 +70,50 @@ function initCursor() {
 const ICONS = {
   mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg>',
   phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>',
-  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>'
+  pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  badge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5"/><path d="M8.3 13.8L7 22l5-2.6 5 2.6-1.3-8.2"/></svg>',
+  layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>',
+  headset: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="14" width="5" height="6" rx="1.5"/><rect x="16.5" y="14" width="5" height="6" rx="1.5"/><path d="M20 20a4 4 0 0 1-4 3h-2"/></svg>',
+  server: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6L2 12l6 6M16 6l6 6-6 6"/></svg>',
+  toolbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="12" rx="1.5"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M2.5 13h19"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>'
+};
+
+const GROUP_ICONS = {
+  support: ICONS.headset,
+  infra: ICONS.server,
+  web: ICONS.code,
+  tools: ICONS.toolbox,
+  professional: ICONS.spark
 };
 
 /* =========================================================
    RENDER: NAV
    ========================================================= */
+/* Sliding "magic line" indicator behind the active nav link. */
+let moveNavIndicator = () => {};
+function initNavIndicator() {
+  const links = $("#navLinks");
+  if (!links) return;
+  const indicator = document.createElement("span");
+  indicator.className = "nav-indicator";
+  indicator.setAttribute("aria-hidden", "true");
+  links.appendChild(indicator);
+
+  moveNavIndicator = (btn) => {
+    if (!btn) { indicator.style.opacity = "0"; return; }
+    indicator.style.opacity = "1";
+    indicator.style.width = btn.offsetWidth + "px";
+    indicator.style.transform = `translateX(${btn.offsetLeft}px)`;
+  };
+  moveNavIndicator($("#navLinks button.active") || $("#navLinks button"));
+  window.addEventListener("resize", () => {
+    moveNavIndicator($("#navLinks button.active"));
+  });
+}
+
 function renderNav() {
   const links = $("#navLinks");
   links.innerHTML = D.nav.map(n => `<button data-goto="${n.id}">${n.label}</button>`).join("");
@@ -73,6 +125,7 @@ function renderNav() {
     btn.addEventListener("click", () => {
       const target = document.getElementById(btn.dataset.goto);
       if (target) target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
+      if ($$("#navLinks button").includes(btn)) moveNavIndicator(btn);
       closeMobile();
     });
   });
@@ -104,6 +157,7 @@ function initScrollSpy() {
         const id = entry.target.id;
         navButtons.forEach(b => b.classList.toggle("active", b.dataset.goto === id));
         mobileButtons.forEach(b => b.classList.toggle("active", b.dataset.goto === id));
+        moveNavIndicator($("#navLinks button.active"));
       }
     });
   }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
@@ -123,6 +177,32 @@ function renderHero() {
   $("#heroDownloadCv").href = D.resume.file;
   $("#heroDownloadCv").download = D.resume.filename;
   $("#heroPortrait").src = D.profile.photo;
+
+  // Stat strip — every number here is a plain count/derivation from
+  // data.js (no invented figures): roles held, certifications earned,
+  // languages spoken, plus the stated years of experience.
+  const stats = [
+    { num: D.profile.experienceYears, lbl: "Years experience" },
+    { num: String(D.experience.length), lbl: "Roles held" },
+    { num: String(D.certifications.length), lbl: "Certifications" },
+    { num: String(D.languages.length), lbl: "Languages" }
+  ];
+  $("#heroStats").innerHTML = stats.map(s => `
+    <div class="hero-stat">
+      <div class="num"><span>${s.num}</span></div>
+      <div class="lbl">${s.lbl}</div>
+    </div>
+  `).join("");
+
+  // Blur-up placeholder: swap to the sharp portrait once it's actually
+  // decoded, and hide the LQIP either way (covers cache-hit + slow-load).
+  const heroImg = $("#heroPortrait");
+  const lqip = $(".portrait-lqip");
+  if (lqip) {
+    const reveal = () => lqip.classList.add("is-hidden");
+    if (heroImg.complete && heroImg.naturalWidth > 0) reveal();
+    else heroImg.addEventListener("load", reveal, { once: true });
+  }
 
   const skillIcons = {
   "Next.js": `
@@ -190,35 +270,37 @@ $("#skillOrbit").innerHTML = preferred
   .join("");
 }
 
-const skillButtons = $$(".skill-float");
+/* Skill-orbit tooltips use delegated listeners bound once on the
+   container/document, so they work regardless of when the buttons
+   inside #skillOrbit were created (fixes tooltips never opening,
+   since the buttons don't exist until renderHero() runs). */
+function bindSkillOrbit() {
+  const orbit = $("#skillOrbit");
+  if (!orbit) return;
 
-skillButtons.forEach(button => {
-  button.addEventListener("click", (event) => {
+  orbit.addEventListener("click", (event) => {
+    const button = event.target.closest(".skill-float");
+    if (!button) return;
     event.stopPropagation();
 
     const isOpen = button.classList.contains("tooltip-open");
-
-    // Close all other tooltips
-    skillButtons.forEach(item => {
+    $$(".skill-float", orbit).forEach(item => {
       item.classList.remove("tooltip-open");
       item.setAttribute("aria-expanded", "false");
     });
-
-    // Toggle the tapped tooltip
     if (!isOpen) {
       button.classList.add("tooltip-open");
       button.setAttribute("aria-expanded", "true");
     }
   });
-});
 
-// Close tooltip when tapping anywhere else
-document.addEventListener("click", () => {
-  skillButtons.forEach(button => {
-    button.classList.remove("tooltip-open");
-    button.setAttribute("aria-expanded", "false");
+  document.addEventListener("click", () => {
+    $$(".skill-float", orbit).forEach(button => {
+      button.classList.remove("tooltip-open");
+      button.setAttribute("aria-expanded", "false");
+    });
   });
-});
+}
 /* =========================================================
    RENDER: ABOUT
    ========================================================= */
@@ -227,6 +309,7 @@ function renderAbout() {
   $("#focusList").innerHTML = D.profile.focusAreas.map(f => `<li>${f}</li>`).join("");
   $("#aboutCards").innerHTML = D.aboutCards.map(c => `
     <div class="about-card">
+      <div class="ic">${ICONS[c.icon] || ""}</div>
       <div class="k">${c.label}</div>
       <div class="v">${c.value}</div>
     </div>
@@ -248,7 +331,7 @@ function renderSkills() {
     const groups = filter === "all" ? D.skillGroups : D.skillGroups.filter(g => g.id === filter);
     groupsEl.innerHTML = groups.map(g => `
       <div class="skill-group">
-        <h3>${g.label}</h3>
+        <h3><span class="grp-ic">${GROUP_ICONS[g.id] || ""}</span>${g.label}</h3>
         <div class="skill-chip-list">
           ${g.items.map(i => `<span class="skill-chip">${i}</span>`).join("")}
         </div>
@@ -275,7 +358,7 @@ function renderSkills() {
    ========================================================= */
 function renderExperience() {
   const tl = $("#timeline");
-  tl.innerHTML = D.experience.map((job, idx) => `
+  tl.innerHTML = `<div class="tl-fill" id="tlFill" aria-hidden="true"></div>` + D.experience.map((job, idx) => `
     <div class="tl-item ${job.current ? "current" : ""} ${idx === 0 ? "open" : ""}" data-idx="${idx}">
       <div class="tl-dot"></div>
       <div class="tl-period mono">${job.period}</div>
@@ -303,6 +386,27 @@ function renderExperience() {
   });
 }
 
+/* Draws the timeline's connecting line progressively as the user
+   scrolls past it, instead of showing the whole thing statically. */
+function initTimelineFill() {
+  const track = $("#timeline");
+  const fill = $("#tlFill");
+  if (!track || !fill) return;
+  let ticking = false;
+  function update() {
+    const r = track.getBoundingClientRect();
+    const ref = innerHeight * 0.7;
+    const progress = Math.min(1, Math.max(0, (ref - r.top) / r.height));
+    fill.style.height = (progress * 100) + "%";
+    ticking = false;
+  }
+  update();
+  addEventListener("scroll", () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+  addEventListener("resize", update);
+}
+
 /* =========================================================
    RENDER: PROJECTS + MODAL
    ========================================================= */
@@ -314,13 +418,30 @@ function renderProjects() {
       <h3>${p.name}</h3>
       <p>${p.description}</p>
       <div class="project-tech">${p.tech.map(t => `<span>${t}</span>`).join("")}</div>
-      <div class="project-more">View details →</div>
+      <div class="project-more">View details <span class="arrow">→</span></div>
     </div>
   `).join("");
 
   $$(".project-card", grid).forEach(card => {
     card.addEventListener("click", () => openProjectModal(card.dataset.id));
   });
+
+  // Gentle tilt-toward-cursor, desktop only.
+  if (desktopFX) {
+    $$(".project-card", grid).forEach(card => {
+      card.addEventListener("pointermove", (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty("--ptx", `${-py * 5}deg`);
+        card.style.setProperty("--pty", `${px * 7}deg`);
+      });
+      card.addEventListener("pointerleave", () => {
+        card.style.setProperty("--ptx", "0deg");
+        card.style.setProperty("--pty", "0deg");
+      });
+    });
+  }
 
   const overlay = $("#projectModal");
   overlay.addEventListener("click", (e) => {
@@ -512,10 +633,18 @@ function initTheme() {
   $("#themeToggle").addEventListener("click", () => { theme = theme === "dark" ? "light" : "dark"; apply(); });
 }
 
+/* Note: cursor-dot/ring movement and hover states live in initCursor(),
+   and click/move ripples live in initRipple(). This function used to
+   also drive #cursorRing (via a second rAF loop writing `transform`)
+   and spawn its own ".click-ripple" on every click — running both
+   copies at once fought over the same element every frame (one set
+   left/top, the other overwrote `transform` and wiped out the
+   centering translate from CSS) and doubled up the click effect.
+   Kept here: scroll progress, ambient particles, the mouse-position
+   CSS vars, portrait tilt, and the magnetic CTA buttons. */
 function initInteractions() {
   const finePointer = matchMedia("(hover:hover) and (pointer:fine)").matches;
   const stage = $("#portraitStage");
-  const cursor = $("#cursorRing");
   const progress = $("#scrollProgress");
 
   const updateScroll = () => {
@@ -537,12 +666,7 @@ function initInteractions() {
   if (!finePointer || prefersReducedMotion) return;
   document.documentElement.classList.add("has-fine-pointer");
 
-  let cx=0, cy=0, tx=0, ty=0, raf;
-  function cursorLoop(){ cx+=(tx-cx)*.18; cy+=(ty-cy)*.18; cursor.style.transform=`translate3d(${cx}px,${cy}px,0)`; raf=requestAnimationFrame(cursorLoop); }
-  cursorLoop();
-
   addEventListener("pointermove", e => {
-    tx=e.clientX; ty=e.clientY;
     const x=(e.clientX/innerWidth-.5), y=(e.clientY/innerHeight-.5);
     document.documentElement.style.setProperty("--mouse-x", `${x*12}px`);
     document.documentElement.style.setProperty("--mouse-y", `${y*12}px`);
@@ -555,15 +679,6 @@ function initInteractions() {
       stage.style.setProperty("--py", `${sy*10}px`);
     }
   }, {passive:true});
-
-  document.addEventListener("pointerover", e => cursor.classList.toggle("active", !!e.target.closest("a,button,.project-card,.skill-chip,.skill-float")));
-  document.addEventListener("pointerout", e => { if(e.target.closest("a,button,.project-card,.skill-chip,.skill-float")) cursor.classList.remove("active"); });
-
-  document.addEventListener("click", e => {
-    const ripple=document.createElement("span"); ripple.className="click-ripple";
-    ripple.style.left=e.clientX+"px"; ripple.style.top=e.clientY+"px";
-    document.body.appendChild(ripple); ripple.addEventListener("animationend",()=>ripple.remove());
-  });
 
   $$(".hero-cta .btn, #navContactBtn").forEach(btn => {
     btn.addEventListener("pointermove", e => {
@@ -598,14 +713,38 @@ function initRipple() {
 }
 
 /* =========================================================
+   SEO: Person structured data, built from the same data.js
+   object the page renders from — nothing here is invented.
+   ========================================================= */
+function injectStructuredData() {
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: D.profile.name,
+    jobTitle: D.profile.title,
+    email: `mailto:${D.profile.email}`,
+    address: { "@type": "PostalAddress", addressLocality: D.profile.location },
+    knowsAbout: D.profile.focusAreas,
+    alumniOf: D.education.map(e => ({ "@type": "CollegeOrUniversity", name: e.school }))
+  };
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(ld);
+  document.head.appendChild(script);
+}
+
+/* =========================================================
    INIT
    ========================================================= */
 function init() {
   renderNav();
+  initNavIndicator();
   renderHero();
+  bindSkillOrbit();
   renderAbout();
   renderSkills();
   renderExperience();
+  initTimelineFill();
   renderProjects();
   renderEducation();
   renderResume();
@@ -617,6 +756,7 @@ function init() {
   initInteractions();
   initCursor();
   initRipple();
+  injectStructuredData();
 }
 
 document.addEventListener("DOMContentLoaded", init);
