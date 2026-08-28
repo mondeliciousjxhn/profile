@@ -24,6 +24,23 @@
 
 </head>
 <body data-theme="dark">
+<script>
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("no-boot");
+  }
+</script>
+<div class="boot-loader" id="bootLoader" aria-hidden="true">
+  <div class="boot-panel">
+    <div class="boot-brand">RM<span>.dev</span></div>
+    <ul class="boot-lines">
+      <li>booting portfolio&hellip;</li>
+      <li>loading profile.json <b>&check;</b></li>
+      <li>mounting sections <b>&check;</b></li>
+      <li>status: <em>online</em></li>
+    </ul>
+    <div class="boot-bar"><i></i></div>
+  </div>
+</div>
 <div class="page-atmosphere" aria-hidden="true"><span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span><div class="particles" id="particles"></div></div>
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
@@ -53,7 +70,9 @@
   <!-- ============ HERO ============ -->
   <section class="hero" id="home">
     <div class="container hero-grid">
-      <div>
+      <span class="hero-deco hero-deco-ring" aria-hidden="true"></span>
+      <span class="hero-deco hero-deco-plus" aria-hidden="true">+</span>
+      <div class="hero-copy">
         <div class="hero-kicker"><span class="dot"></span><span class="mono">STATUS: EMPLOYED BUT OPEN TO OPPORTUNITIES</span></div>
         <h1>Hi, I'm <span>Raymond</span> — IT support &amp; web development, kept reliable.</h1>
         <p class="hero-role" id="heroIntro"></p>
@@ -63,6 +82,7 @@
           <button class="btn btn-outline" data-goto="contact">Contact Me</button>
         </div>
         <div class="hero-tags" id="heroTags"></div>
+        <div class="hero-stats" id="heroStats"></div>
       </div>
 
       <div class="portrait-stage reveal" id="portraitStage">
@@ -70,7 +90,8 @@
         <div class="portrait-backdrop backdrop-one"></div>
         <div class="portrait-backdrop backdrop-two"></div>
         <div class="portrait-shell">
-          <img id="heroPortrait" src="assets/profile-photo-white.jpg" alt="Portrait of Raymond John Managuit" width="720" height="900">
+          <img id="heroPortrait" src="assets/profile-photo-white.jpg" alt="Portrait of Raymond John Managuit" width="1000" height="1250" decoding="async">
+          <img class="portrait-lqip" src="assets/profile-photo-white2.jpg" alt="" aria-hidden="true" width="40" height="50">
           <div class="portrait-shine"></div>
         </div>
         <div class="portrait-shadow"></div>
@@ -94,7 +115,7 @@
             <ul class="about-focus-list" id="focusList"></ul>
           </div>
         </div>
-        <div class="about-cards reveal" id="aboutCards"></div>
+        <div class="about-cards reveal stagger" id="aboutCards"></div>
       </div>
     </div>
   </section>
@@ -108,7 +129,7 @@
         <p class="section-desc">Grouped by discipline. Filter to a category, or browse everything.</p>
       </div>
       <div class="skill-filters reveal" id="skillFilters"></div>
-      <div class="skill-groups reveal" id="skillGroups"></div>
+      <div class="skill-groups reveal stagger" id="skillGroups"></div>
       <div class="languages-row reveal" id="languagesRow"></div>
     </div>
   </section>
@@ -133,7 +154,7 @@
         <h2 class="section-title">What I've built and maintained.</h2>
         <p class="section-desc">Drawn directly from my professional experience.</p>
       </div>
-      <div class="project-grid reveal" id="projectGrid"></div>
+      <div class="project-grid reveal stagger" id="projectGrid"></div>
     </div>
   </section>
 
@@ -148,8 +169,8 @@
         <div class="reveal">
           <div id="eduList"></div>
         </div>
-        <div class="reveal">
-          <div class="cert-list" id="certList"></div>
+        <div>
+          <div class="cert-list reveal stagger" id="certList"></div>
         </div>
       </div>
     </div>
@@ -180,8 +201,8 @@
         <p class="section-desc">Reach out directly, or send a message below.</p>
       </div>
       <div class="contact-layout">
-        <div class="reveal">
-          <div class="contact-list" id="contactList"></div>
+        <div>
+          <div class="contact-list reveal stagger" id="contactList"></div>
         </div>
         <form class="reveal" id="contactForm" novalidate>
           <div class="form-grid">
